@@ -48,7 +48,7 @@ export default class DeadlineExtensionsModel {
   assignmentId: number
 
   @Column({ name: 'creator_id' })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'creator_id' })
   @ManyToOne(() => UserModel)
   creatorId: number
 
