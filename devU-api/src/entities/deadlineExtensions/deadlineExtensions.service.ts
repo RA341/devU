@@ -37,11 +37,6 @@ export async function retrieve(id: number) {
   return await connect().findOne({ id, deletedAt: IsNull() })
 }
 
-
-export async function retrieveByUserId(userId: number) {
-  return await connect().findOne({ userId, deletedAt: IsNull() })
-}
-
 export async function list() {
   return await connect().find({ deletedAt: IsNull() })
 }
@@ -49,7 +44,6 @@ export async function list() {
 export default {
   create,
   retrieve,
-  retrieveByUserId,
   update,
   _delete,
   list,
