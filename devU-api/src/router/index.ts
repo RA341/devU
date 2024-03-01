@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import swaggerUi from 'swagger-ui-express'
 
 import swagger from '../utils/swagger.utils'
@@ -17,11 +17,12 @@ import assignmentProblem from '../entities/assignmentProblem/assignmentProblem.r
 import submissionProblemScore from '../entities/submissionProblemScore/submissionProblemScore.router'
 import fileUpload from '../fileUpload/fileUpload.router'
 import grader from '../entities/grader/grader.router'
+import nonContainerAutoGraderRouter from '../entities/nonContainerAutoGrader/nonContainerAutoGrader.router'
+import deadlineExtensions from '../entities/deadlineExtensions/deadlineExtensions.router'
 
 import { isAuthorized } from '../auth/auth.middleware'
 
 import { NotFound } from '../utils/apiResponse.utils'
-import nonContainerAutoGraderRouter from "../entities/nonContainerAutoGrader/nonContainerAutoGrader.router";
 
 const Router = express.Router()
 
@@ -36,6 +37,7 @@ Router.use('/nonContainerAutoGrader', isAuthorized, nonContainerAutoGraderRouter
 Router.use('/container-auto-graders', isAuthorized, containerAutoGrader)
 Router.use('/submission-problem-scores', isAuthorized, submissionProblemScore)
 Router.use('/file-upload', isAuthorized, fileUpload)
+Router.use('/deadline-extensions', isAuthorized, deadlineExtensions)
 Router.use('/grade', isAuthorized, grader)
 
 Router.use('/login', login)
