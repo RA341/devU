@@ -1,14 +1,14 @@
 import { UpdateResult } from 'typeorm'
 
-import { Assignment } from 'devu-shared-modules'
+import { DeadlineExtensions } from 'devu-shared-modules'
 
-import controller from '../assignment.controller'
+import controller from '../deadlineExtensions.controller'
 
-import AssignmentModel from '../assignment.model'
+import DeadlineExtensionsModel from '../deadlineExtensions.model'
 
-import AssignmentService from '../assignment.service'
+import DeadlineExtensionsService from '../deadlineExtensions.service'
 
-import { serialize } from '../assignment.serializer'
+import { serialize } from '../deadlineExtensions.serializer'
 
 import Testing from '../../../utils/testing.utils'
 import { GenericResponse, NotFound, Updated } from '../../../utils/apiResponse.utils'
@@ -18,20 +18,20 @@ let req: any
 let res: any
 let next: any
 
-let mockedAssignments: AssignmentModel[]
-let mockedAssignment: AssignmentModel
-let expectedResults: Assignment[]
-let expectedResult: Assignment
+let mockedAssignments: DeadlineExtensionsModel[]
+let mockedAssignment: DeadlineExtensionsModel
+let expectedResults: DeadlineExtensions[]
+let expectedResult: DeadlineExtensions
 let expectedError: Error
 
 let expectedDbResult: UpdateResult
 
-function populateAssignment(assignment: AssignmentModel) {
-  assignment.startDate = new Date()
-  assignment.endDate = new Date()
-  assignment.dueDate = new Date()
+function populateAssignment(extension: DeadlineExtensionsModel) {
+  extension.deadlineDate = new Date()
+  extension.newEndDate = new Date()
+  extension.newStartDate = new Date()
 
-  return assignment
+  return extension
 }
 
 describe('AssignmentController', () => {
@@ -40,8 +40,8 @@ describe('AssignmentController', () => {
     res = Testing.fakeResponse()
     next = Testing.fakeNext()
 
-    mockedAssignments = Testing.generateTypeOrmArray(AssignmentModel, 3).map(populateAssignment)
-    mockedAssignment = populateAssignment(Testing.generateTypeOrm(AssignmentModel))
+    mockedAssignments = Testing.generateTypeOrmArray(DeadlineExtensionsModel, 3).map(populateAssignment)
+    mockedAssignment = populateAssignment(Testing.generateTypeOrm(DeadlineExtensionsModel))
 
     expectedResults = mockedAssignments.map(serialize)
     expectedResult = serialize(mockedAssignment)
@@ -50,20 +50,20 @@ describe('AssignmentController', () => {
     expectedDbResult = {} as UpdateResult
   })
 
-  describe('GET - /assignments', () => {
+  describe('GET - /deadline-extensions', () => {
     describe('200 - Ok', () => {
       beforeEach(async () => {
-        AssignmentService.list = jest.fn().mockImplementation(() => Promise.resolve(mockedAssignments))
+        DeadlineExtensionsService.list = jest.fn().mockImplementation(() => Promise.resolve(mockedAssignments))
         await controller.get(req, res, next) // what we're testing
       })
 
-      test('Returns list of assignments', () => expect(res.json).toBeCalledWith(expectedResults))
+      test('Returns list of deadline-extensions', () => expect(res.json).toBeCalledWith(expectedResults))
       test('Status code is 200', () => expect(res.status).toBeCalledWith(200))
     })
 
     describe('400 - Bad request', () => {
       test('Next called with expected error', async () => {
-        AssignmentService.list = jest.fn().mockImplementation(() => Promise.reject(expectedError))
+        DeadlineExtensionsService.list = jest.fn().mockImplementation(() => Promise.reject(expectedError))
 
         try {
           await controller.get(req, res, next)
@@ -76,31 +76,31 @@ describe('AssignmentController', () => {
     })
   })
 
-  describe('GET - /assignments/:id', () => {
+  describe('GET - /deadline-extensions/:id', () => {
     describe('200 - Ok', () => {
       beforeEach(async () => {
-        AssignmentService.retrieve = jest.fn().mockImplementation(() => Promise.resolve(mockedAssignment))
+        DeadlineExtensionsService.retrieve = jest.fn().mockImplementation(() => Promise.resolve(mockedAssignment))
         await controller.detail(req, res, next)
       })
 
-      test('Returns expected assignment', () => expect(res.json).toBeCalledWith(expectedResult))
+      test('Returns expected DeadlineExtension', () => expect(res.json).toBeCalledWith(expectedResult))
       test('Status code is 200', () => expect(res.status).toBeCalledWith(200))
     })
 
     describe('404 - Not Found', () => {
       beforeEach(async () => {
-        AssignmentService.retrieve = jest.fn().mockImplementation(() => Promise.resolve()) // No results
+        DeadlineExtensionsService.retrieve = jest.fn().mockImplementation(() => Promise.resolve()) // No results
         await controller.detail(req, res, next)
       })
 
-      test('Status code is 404 on missing assignment', () => expect(res.status).toBeCalledWith(404))
-      test('Responds with NotFound on missing assignment', () => expect(res.json).toBeCalledWith(NotFound))
-      test('Next not called on missing assignment', () => expect(next).toBeCalledTimes(0))
+      test('Status code is 404 on missing DeadlineExtension', () => expect(res.status).toBeCalledWith(404))
+      test('Responds with NotFound on missing DeadlineExtension', () => expect(res.json).toBeCalledWith(NotFound))
+      test('Next not called on missing DeadlineExtension', () => expect(next).toBeCalledTimes(0))
     })
 
     describe('400 - Bad Request', () => {
       test('Next called with expected error', async () => {
-        AssignmentService.retrieve = jest.fn().mockImplementation(() => Promise.reject(expectedError))
+        DeadlineExtensionsService.retrieve = jest.fn().mockImplementation(() => Promise.reject(expectedError))
 
         try {
           await controller.detail(req, res, next)
@@ -113,20 +113,20 @@ describe('AssignmentController', () => {
     })
   })
 
-  describe('POST - /assignments/', () => {
+  describe('POST - /deadline-extensions/', () => {
     describe('201 - Created', () => {
       beforeEach(async () => {
-        AssignmentService.create = jest.fn().mockImplementation(() => Promise.resolve(mockedAssignment))
+        DeadlineExtensionsService.create = jest.fn().mockImplementation(() => Promise.resolve(mockedAssignment))
         await controller.post(req, res, next)
       })
 
-      test('Returns expected assignment', () => expect(res.json).toBeCalledWith(expectedResult))
+      test('Returns expected DeadlineExtension', () => expect(res.json).toBeCalledWith(expectedResult))
       test('Status code is 201', () => expect(res.status).toBeCalledWith(201))
     })
 
     describe('400 - Bad Request', () => {
       beforeEach(async () => {
-        AssignmentService.create = jest.fn().mockImplementation(() => Promise.reject(expectedError))
+        DeadlineExtensionsService.create = jest.fn().mockImplementation(() => Promise.reject(expectedError))
 
         try {
           await controller.post(req, res, next)
@@ -144,11 +144,11 @@ describe('AssignmentController', () => {
     })
   })
 
-  describe('PUT - /assignments/:id', () => {
+  describe('PUT - /deadline-extensions/:id', () => {
     describe('200 - Ok', () => {
       beforeEach(async () => {
         expectedDbResult.affected = 1 // mocking service return shape
-        AssignmentService.update = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
+        DeadlineExtensionsService.update = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
         await controller.put(req, res, next)
       })
 
@@ -160,7 +160,7 @@ describe('AssignmentController', () => {
     describe('404 - Not Found', () => {
       beforeEach(async () => {
         expectedDbResult.affected = 0 // No records affected in db
-        AssignmentService.update = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
+        DeadlineExtensionsService.update = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
         await controller.put(req, res, next)
       })
 
@@ -171,7 +171,7 @@ describe('AssignmentController', () => {
 
     describe('400 - Bad Request', () => {
       beforeEach(async () => {
-        AssignmentService.update = jest.fn().mockImplementation(() => Promise.reject(expectedError))
+        DeadlineExtensionsService.update = jest.fn().mockImplementation(() => Promise.reject(expectedError))
         await controller.put(req, res, next)
       })
 
@@ -179,11 +179,11 @@ describe('AssignmentController', () => {
     })
   })
 
-  describe('DELETE - /assignments/:id', () => {
+  describe('DELETE - /deadline-extensions/:id', () => {
     describe('204 - No Content', () => {
       beforeEach(async () => {
         expectedDbResult.affected = 1
-        AssignmentService._delete = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
+        DeadlineExtensionsService._delete = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
         await controller._delete(req, res, next)
       })
 
@@ -195,7 +195,7 @@ describe('AssignmentController', () => {
     describe('404 - Not Found', () => {
       beforeEach(async () => {
         expectedDbResult.affected = 0
-        AssignmentService._delete = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
+        DeadlineExtensionsService._delete = jest.fn().mockImplementation(() => Promise.resolve(expectedDbResult))
         await controller._delete(req, res, next)
       })
 
@@ -206,7 +206,7 @@ describe('AssignmentController', () => {
 
     describe('400 - Bad Request', () => {
       beforeEach(async () => {
-        AssignmentService._delete = jest.fn().mockImplementation(() => Promise.reject(expectedError))
+        DeadlineExtensionsService._delete = jest.fn().mockImplementation(() => Promise.reject(expectedError))
         await controller._delete(req, res, next)
       })
 

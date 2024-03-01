@@ -14,7 +14,7 @@ const Router = express.Router()
  * @swagger
  * /deadline-extensions:
  *   get:
- *     summary: Retrieve all deadline-extension
+ *     summary: Retrieve all deadline-extensions
  *     tags:
  *       - DeadlineExtensionsModel
  *     responses:
