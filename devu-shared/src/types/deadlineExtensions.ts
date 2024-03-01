@@ -2,8 +2,10 @@ export type DeadlineExtensions = {
   id?: number
   creatorId: number
   userId: number
-  deadlineDate: string
   assignmentId: number
+  deadlineDate: string
+  newStartDate?: string
+  newEndDate?: string
   createdAt?: string
   updatedAt?: string
 }
