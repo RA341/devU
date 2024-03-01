@@ -12,11 +12,11 @@ const Router = express.Router()
 
 /**
  * @swagger
- * /assignments:
+ * /deadline-extensions:
  *   get:
- *     summary: Retrieve a list of assignments
+ *     summary: Retrieve all deadline-extension
  *     tags:
- *       - Assignments
+ *       - DeadlineExtensionsModel
  *     responses:
  *       '200':
  *         description: OK
@@ -25,11 +25,11 @@ Router.get('/', DeadlineExtensionsController.get)
 
 /**
  * @swagger
- * /assignments/{id}:
+ * /deadline-extensions/{id}:
  *   get:
- *     summary: Retrieve a single assignment
+ *     summary: Retrieve a single Deadline-Extension
  *     tags:
- *       - Assignments
+ *       - DeadlineExtensionsModel
  *     responses:
  *       '200':
  *         description: OK
@@ -44,11 +44,11 @@ Router.get('/:id', asInt(), DeadlineExtensionsController.detail)
 
 /**
  * @swagger
- * /assignments:
+ * /deadline-extensions:
  *   post:
- *     summary: Create an assignment
+ *     summary: Create a Deadline-Extension
  *     tags:
- *       - Assignments
+ *       - DeadlineExtensionsModel
  *     responses:
  *       '200':
  *         description: OK
@@ -56,17 +56,17 @@ Router.get('/:id', asInt(), DeadlineExtensionsController.detail)
  *       content:
  *         application/x-www-form-urlencoded:
  *           schema:
- *             $ref: '#/components/schemas/Assignment'
+ *             $ref: '#/components/schemas/DeadlineExtensionsModel'
  */
 Router.post('/', validator, DeadlineExtensionsController.post)
 
 /**
  * @swagger
- * /assignments/{id}:
+ * /deadline-extensions/{id}:
  *   put:
- *     summary: Update an assignment
+ *     summary: Update a Deadline-Extensions
  *     tags:
- *       - Assignments
+ *       - DeadlineExtensionsModel
  *     responses:
  *       '200':
  *         description: OK
@@ -80,17 +80,17 @@ Router.post('/', validator, DeadlineExtensionsController.post)
  *       content:
  *         application/x-www-form-urlencoded:
  *           schema:
- *             $ref: '#/components/schemas/Assignment'
+ *             $ref: '#/components/schemas/DeadlineExtensionsModel'
  */
 Router.put('/:id', asInt(), validator, DeadlineExtensionsController.put)
 
 /**
  * @swagger
- * /assignments/{id}:
+ * /deadline-extensions/{id}:
  *   delete:
- *     summary: Delete an assignment
+ *     summary: Delete a Deadline-Extension
  *     tags:
- *       - Assignments
+ *       - DeadlineExtensionsModel
  *     responses:
  *       '200':
  *         description: OK
