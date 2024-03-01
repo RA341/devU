@@ -16,7 +16,7 @@ export default class DeadlineExtensionsModel {
   /**
    * @swagger
    * tags:
-   *   - name: Assignments
+   *   - name: DeadlineExtensions
    *     description:
    * components:
    *  schemas:
@@ -36,7 +36,12 @@ export default class DeadlineExtensionsModel {
    *        deadline_date:
    *          type: string
    *          description: The deadline date. Must be in ISO 8601 format.
-   *
+   *        new_start_Date:
+   *          type: Date|null
+   *          description: Optional field to specify new start date for an assignment, if specified this will override assignment start_date. Must be in ISO 8601 format.
+   *        new_end_Date:
+   *          type: Date|null
+   *          description: Optional field to specify new end date for an assignment, if specified this will override assignment end_date. Must be in ISO 8601 format.
    */
 
   @PrimaryGeneratedColumn()
@@ -59,6 +64,12 @@ export default class DeadlineExtensionsModel {
 
   @Column({ name: 'deadline_date' })
   deadlineDate: Date
+
+  @Column({ name: 'new_end_date' })
+  newEndDate: Date | null
+
+  @Column({ name: 'new_start_date' })
+  newStartDate: Date | null
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date

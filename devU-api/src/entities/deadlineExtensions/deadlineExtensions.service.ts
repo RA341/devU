@@ -17,6 +17,8 @@ export async function update(assignment: DeadlineExtensions) {
     creatorId,
     deadlineDate,
     assignmentId,
+    newEndDate,
+    newStartDate,
   } = assignment
 
   if (!id) throw new Error('Missing Id')
@@ -26,6 +28,8 @@ export async function update(assignment: DeadlineExtensions) {
     userId,
     deadlineDate,
     assignmentId,
+    newStartDate,
+    newEndDate,
   })
 }
 
