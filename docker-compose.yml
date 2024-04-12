@@ -95,7 +95,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./logs/tango/:/var/log/tango/
       - ./logs/tangonginx:/var/log/nginx
-#      - ./Tango/volumes:/opt/TangoService/Tango/volumes
+      - ./tango_files:/opt/TangoService/Tango/volumes
 
 #  certbot:
 #    container_name: certbot
