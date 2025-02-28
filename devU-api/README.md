@@ -19,7 +19,7 @@ Once you've got these installed, we can build our container and run it
 
 You have to modify `devU-api/src/environment.ts`
 
-change
+change 
 
 `dbHost: (load('database.host') || 'localhost') as string`
 
