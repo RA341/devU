@@ -6,7 +6,7 @@ name: devu
 services:
   api:
     container_name: api
-    image: ghcr.io/makeopensource/devu/api:develop
+    image: ghcr.io/ra341/devu/api:develop
     environment:
       TANGO_KEY: devutangokey # TODO: load in from env file. for now this is defined in tango section below
       WAIT_HOSTS: db:5432
@@ -19,7 +19,7 @@ services:
 
   client:
     # Builds the front end and serves the frontend static files using nginx
-    image: ghcr.io/makeopensource/devu/client:develop
+    image: ghcr.io/ra341/devu/client:develop
     ports:
       - '9000:80'
 
@@ -27,7 +27,7 @@ services:
     container_name: tango
     ports:
       - '127.0.0.1:3000:3000'
-    image: ghcr.io/makeopensource/devu/tango:develop
+    image: ghcr.io/ra341/devu/tango:develop
     environment:
       - DOCKER_REDIS_HOSTNAME=redis
       - RESTFUL_KEY=devutangokey

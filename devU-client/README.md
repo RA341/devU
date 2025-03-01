@@ -26,7 +26,7 @@ As of writing, we are using node version 16, so run
 
 **Warning this will change the node version globally
 so for other projects you need to change node version again.**
-
+ 
 ```
 nvm use 16
 ```
