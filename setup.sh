@@ -63,19 +63,23 @@ echo -e "${BOLD}${PURPLE}Configuration Setup${NC}\n"
 
 # Prompt for URLs
 echo -e "${CYAN}Enter the URLs:${NC}"
-read -p "  Frontend URL (e.g., https://devu.app): " client_url
+echo -en "  Frontend URL (e.g., https://devu.app): "
+read -e client_url
 echo ""
 
-read -p "  API URL (e.g., https://api.devu.app): " api_url
+echo -en "  API URL (e.g., https://api.devu.app): "
+read -e api_url
 echo ""
 
 # Prompt for port configuration
 echo -e "${CYAN}Configure ports:${NC}"
-read -p "  API port (default: 3001): " api_port
+echo -en "  API port (default: 3001): "
+read -e api_port
 api_port=${api_port:-3001}
 echo ""
 
-read -p "  Client port (default: 9000): " client_port
+echo -en "  Client port (default: 9000): "
+read -e client_port
 client_port=${client_port:-9000}
 echo ""
 
@@ -84,14 +88,16 @@ echo ""
 # ---------------------------------------------------------------------------
 
 echo -e "${CYAN}Auto-update configuration:${NC}"
-read -p "  Enable watchtower auto-update service? (y/N): " use_watchtower
+echo -en "  Enable watchtower auto-update service? (y/N): "
+read -e use_watchtower
 use_watchtower=${use_watchtower:-"n"}  # Default to "n" if empty
 use_watchtower=${use_watchtower,,}     # Convert to lowercase
 echo ""
 
 if [[ "$use_watchtower" == "y" || "$use_watchtower" == "yes" ]]; then
   # Ask for check interval (in seconds)
-  read -rp "  Enter watchtower check interval in seconds (default: 900): " watchtower_interval
+  echo -en "  Enter watchtower check interval in seconds (default: 900): "
+  read -e watchtower_interval
   watchtower_interval=${watchtower_interval:-900}
   echo ""
 
