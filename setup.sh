@@ -27,42 +27,20 @@ else
   exit 1
 fi
 
+# Prompt for URLs
+read -rp "Enter the frontend URL (e.g., https://devu.app): " client_url
+read -rp "Enter the API URL (e.g., https://api.devu.app): " api_url
 
-tango_conf_filename="tango.config.py"
-raw_url="https://raw.githubusercontent.com/$owner/$repo/$branch/$tango_conf_filename"
+# Use sed to replace the placeholder URLs in the docker-compose file
+sed -i "s|CLIENT_URL: https://client.devu.app|CLIENT_URL: $client_url|g" "$compose_local_filename"
+sed -i "s|API_URL=https://devu.app|API_URL=$api_url|g" "$compose_local_filename"
 
-echo "Downloading $tango_conf_filename from $owner/$repo (branch: $branch) to $tango_conf_filename"
+echo "Updated Docker Compose file with:"
+echo "Client URL: $client_url"
+echo "API URL: $api_url"
 
-if curl -sSL "$raw_url" -o "$tango_conf_filename"; then
-  echo "Download successful!"
-else
-  echo "Download failed. Check the repository, branch, and file path."
-  exit 1
-fi
-
-
-# Create the 'tango_files' directory if it doesn't exist
-mkdir -p tango_files
-
-# Get the absolute path of the 'tango_files' directory
-absolute_path=$(realpath tango_files)
-
-docker_compose_file="docker-compose.yml"
-
-if [ ! -f "$docker_compose_file" ]; then
-  echo "Error: Docker Compose file '$docker_compose_file' not found."
-  exit 1
-fi
-
-# 5. Use sed to replace the placeholder with the absolute path
-if sed -i "s|DOCKER_TANGO_HOST_VOLUME_PATH=.*|DOCKER_TANGO_HOST_VOLUME_PATH=$absolute_path|" "$docker_compose_file"; then
-  echo "Successfully updated $docker_compose_file with path: $absolute_path"
-else
-  echo "Error: Failed to update $docker_compose_file."
-  exit 1
-fi
-
-docker compose up
+# Start the containers
+echo "Starting containers..."
+docker compose up -d
 
 exit 0
-

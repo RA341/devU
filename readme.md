@@ -146,12 +146,10 @@ query: CREATE TABLE "users" ("id" SERIAL NOT NULL, "createdAt" TIMESTAMP NOT NUL
 
 ## Deploy script
 
-To quickly setup a production version of devU you can call the [setup script](setup.sh)
+To quickly setup a semi-production version of devU you can call the [setup script](setup.sh)
 
 ```
  bash <(curl -sSL https://raw.githubusercontent.com/makeopensource/devU/refs/heads/develop/setup.sh) makeopensource develop
 ```
 
 This will download our [compose file](example-docker-compose.yml) with our pre-built images
-
-Currently, built only for develop, and setup the required config for tango
