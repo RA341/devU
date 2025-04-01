@@ -33,6 +33,25 @@ api_port=${api_port:-3001}
 read -rp "Enter the port to expose the client (default: 9000): " client_port
 client_port=${client_port:-9000}
 
+# Prompt for watchtower configuration
+read -rp "Enable watchtower auto-update service? (y/N): " use_watchtower
+use_watchtower=${use_watchtower,,}  # Convert to lowercase
+
+if [[ "$use_watchtower" == "y" || "$use_watchtower" == "yes" ]]; then
+  # Ask for check interval (in seconds)
+  read -rp "Enter watchtower check interval in seconds (default: 900): " watchtower_interval
+  watchtower_interval=${watchtower_interval:-900}
+
+  # Update the watchtower check interval
+  sed -i "s|WATCHTOWER_POLL_INTERVAL=900|WATCHTOWER_POLL_INTERVAL=$watchtower_interval|g" "$compose_local_filename"
+
+  echo "Watchtower enabled with check interval: $watchtower_interval seconds"
+else
+  # Comment out the watchtower service in the docker-compose file
+  sed -i '/watchtower:/,/restart: unless-stopped/s/^/# /' "$compose_local_filename"
+  echo "Watchtower service disabled"
+fi
+
 # Use sed to replace the placeholder URLs in the docker-compose file
 sed -i "s|CLIENT_URL: https://client.devu.app|CLIENT_URL: $client_url|g" "$compose_local_filename"
 sed -i "s|API_URL=https://devu.app|API_URL=$api_url|g" "$compose_local_filename"
