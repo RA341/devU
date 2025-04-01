@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import {useHistory, useParams} from 'react-router-dom'
 import PageWrapper from 'components/shared/layouts/pageWrapper'
-import {Assignment, AssignmentProblem, Submission, /*NonContainerAutoGrader, /*ContainerAutoGrader*/} from 'devu-shared-modules'
+import AssignmentProblemListItem from 'components/listItems/assignmentProblemListItem'
+import {Assignment, AssignmentProblem, Course, Submission,  NonContainerAutoGrader /*SubmissionScore, /*ContainerAutoGrader*/} from 'devu-shared-modules'
 import RequestService from 'services/request.service'
 import ErrorPage from '../errorPage/errorPage'
 import LoadingOverlay from 'components/shared/loaders/loadingOverlay'
@@ -9,13 +10,13 @@ import {useActionless, useAppSelector} from 'redux/hooks'
 import {SET_ALERT} from 'redux/types/active.types'
 //import Card from '@mui/material/Card'
 //import CardContent from '@mui/material/CardContent'
-import {Accordion, AccordionDetails, TextField, Typography} from '@mui/material'
+//import {Accordion, AccordionDetails, TextField, Typography} from '@mui/material'
 
 
-import Grid from '@mui/material/Unstable_Grid2'
+//import Grid from '@mui/material/Unstable_Grid2'
 
 import styles from './assignmentDetailPage.scss'
-import {prettyPrintDateTime} from "../../../utils/date.utils";
+import {prettyPrintDateTime, fullWordPrintDate} from "../../../utils/date.utils";
 
 import { useLocation } from 'react-router-dom';
 import Scoreboard from '../assignments/scoreboard';
@@ -29,18 +30,21 @@ const AssignmentDetailPage = () => {
 
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(true)
-    const [formData, setFormData] = useState({})
+    const [formData, setFormData] = useState<{ [key: string]: string }>({})
     const [file, setFile] = useState<File | null>()
     const [assignmentProblems, setAssignmentProblems] = useState(new Array<AssignmentProblem>())
     const [submissions, setSubmissions] = useState(new Array<Submission>())
-    // const [submissionScores, setSubmissionScores] = useState(new Array<SubmissionScore>())
-    // const [submissionProblemScores, setSubmissionProblemScores] = useState(new Array<SubmissionProblemScore>())
     const [assignment, setAssignment] = useState<Assignment>()
+    const [course, setCourse] = useState<Course>()
+    const [notClickable, setClickable] = useState(true);
+
+
 
     // const [containerAutograder, setContainerAutograder] = useState<ContainerAutoGrader | null>()
     // const contaierAutograder = false; //TODO: Use the above commented out code to get the container autograder
-    // const [ setNonContainerAutograders] = useState(new Array <NonContainerAutoGrader>())
+    const [nonContainerAutograders, setNonContainerAutograders] = useState(new Array <NonContainerAutoGrader>())
     const [showScoreboard, setShowScoreboard] = useState(false);
+    setShowScoreboard;
     const location = useLocation();
 
     useEffect(() => {
@@ -52,6 +56,9 @@ const AssignmentDetailPage = () => {
         try {
             const assignments = await RequestService.get<Assignment>(`/api/course/${courseId}/assignments/${assignmentId}`)
             setAssignment(assignments)
+
+            const courses = await RequestService.get<Course>(`/api/courses/${courseId}`)
+            setCourse(courses)
 
             const assignmentProblemsReq = await RequestService.get<AssignmentProblem[]>(`/api/course/${courseId}/assignment/${assignmentId}/assignment-problems/`)
             setAssignmentProblems(assignmentProblemsReq)
@@ -75,9 +82,9 @@ const AssignmentDetailPage = () => {
             // const containerAutograder = (await RequestService.get<ContainerAutoGrader[]>(`/api/course/${courseId}/assignment/${assignmentId}/container-auto-graders`)).pop() ?? null
             // setContainerAutograder(containerAutograder)
 
-            // const nonContainers = await RequestService.get<NonContainerAutoGrader[]>(`/api/course/${courseId}/assignment/${assignmentId}/non-container-auto-graders`)
-            // setNonContainerAutograders(nonContainers)
-
+            const nonContainers = await RequestService.get<NonContainerAutoGrader[]>(`/api/course/${courseId}/assignment/${assignmentId}/non-container-auto-graders`)
+            setNonContainerAutograders(nonContainers)
+            nonContainerAutograders
 
         } catch (err:any) {
             setError(err)
@@ -90,23 +97,52 @@ const AssignmentDetailPage = () => {
 
     if (loading) return <LoadingOverlay delay={250} />
     if (error) return <ErrorPage error={error} />
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const type = e.target.type;
+        const value = e.target.value;
+        const key = e.target.id;
+    
+        if (type === 'checkbox') { // behavior for multiple choic questions
+            const newState = e.target.checked;
+    
+            setFormData(prevState => {
+                const currentValue = prevState[key] || ""; 
+                let res = '';
+                if (newState) {
+                    res = currentValue + value
+                } else {
+                    res = currentValue.replace(value, "")
+                }
+                res = res.split('').sort().join('') // makes selecting answers in any order correct
+                return {
+                    ...prevState,
+                    [key]: res
+                };
+            });
 
-    const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
-        const key = e.target.id
-        setFormData(prevState => ({...prevState,[key] : e.target.value}))
-    }
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [key]: value
+            }));
+        }
+    };
 
 
     const handleFileChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         setFile(e.target.files?.item(0))
     }
 
+    const handleCheckboxChange = () => {
+        setClickable(!notClickable);
+    };
 
     const handleSubmit = async () => {
         let response;
         const contentField = {
             filepaths : [],
-            form : formData,
+            form : formData
         }
         const submission = {
             userId : userId,
@@ -114,6 +150,8 @@ const AssignmentDetailPage = () => {
             courseId : courseId,
             content : JSON.stringify(contentField),
         }
+
+        console.log(contentField)
 
         setLoading(true)
 
@@ -154,102 +192,79 @@ const AssignmentDetailPage = () => {
         }
         return false;
     };
+    isSubmissionDisabled;
+    handleFileChange;
 
 
     return(
         <PageWrapper>
             <div className={styles.header}>
-                <h1 className = {styles.assignment_heading}>{assignment?.name}</h1>
-                <hr className= {styles.line}/>
-                </div>
-                <div className = {styles.wrap}>
-
-                {role.isInstructor() && (
-                    <>
-                    <div className={styles.card}>
-                <h2 className={styles.card_heading}>Options</h2>
-                <hr className = {styles.line} />
-                    <div className={styles.options_buttons}>
-                    {role.isInstructor() && <button className={styles.buttons} onClick={() => {
-                        history.push(`/course/${courseId}/assignment/${assignmentId}/createNCAG`)
-                    }}>Add NCAG</button>}
-                    <hr className = {styles.line} />
-                    {role.isInstructor() && <button  className={styles.buttons} onClick={() => {
-                        history.push(`/course/${courseId}/assignment/${assignmentId}/createCAG`)
-                    }}>Add CAG</button>}
-                    <hr className = {styles.line} />
-                    {role.isInstructor() && <button className={styles.buttons} onClick={() => {
-                        history.push(`/course/${courseId}/assignment/${assignmentId}/createProblem`)
-                    }}>Add Assignment Question</button>}
-                    <hr className = {styles.line} />
-                    {role.isInstructor() && <button  className={styles.buttons} onClick={() => {
-                        history.push(`/course/${courseId}/assignment/${assignmentId}/update`)
-                    }}>Edit Assignment</button>}
-
-                        <hr className = {styles.line} />
-                        {role.isInstructor() && <button className={styles.buttons} onClick={() => {
-                            history.push
-                            (`/course/${courseId}/assignment/${assignmentId}/submissions`)
-                        }}>Grade Submissions</button>}
-
-                        <hr className = {styles.line} />
-                        {role.isInstructor() && <button
-                            className={styles.buttons} onClick={() => {
-                            setShowScoreboard(!showScoreboard)}
-
-                        }>Scoreboard</button>
-                        }
-                    </div>
-                    </div>
-                   </>
-                    )}
-
-
-            <Grid display='flex' justifyContent='center' alignItems='center'>
-            <div className={styles.assignment_card}>
-            <Typography className={styles.assignment_description}>{assignment?.description}</Typography>
-            <Typography className={styles.filenames}>Attachments : {assignment?.attachmentsFilenames}</Typography>
-            <hr className={styles.line} />
-
-            {assignment?.dueDate && (
-                    <Typography className={styles.due_date}>{`Due Date: ${new Date(assignment.dueDate).toLocaleDateString()}`}</Typography>
-                )}
-            {assignmentProblems && assignmentProblems.length > 0 ? (
-                assignmentProblems.map((assignmentProblem, index) => (
-                    <Accordion className={styles.accordion} key={index}>
-
-                    <AccordionDetails className={styles.accordionDetails}>
-                        <Typography>{assignmentProblem.problemName}</Typography>
-                        <TextField id={assignmentProblem.problemName} fullWidth className={styles.textField} variant='outlined' label='Answer' onChange={handleChange}></TextField>
-                    </AccordionDetails>
-                    </Accordion>
-                ))
-
-                ) : (
-                <div>
-                    <Typography>No Problems Exist</Typography>
-                </div>
-            )}
-
-            {!(assignment?.disableHandins) && (<input type="file"
-                                                      className={styles.fileInput}
-                                                      onChange={handleFileChange} />)}
-
-
-
-            { !(isSubmissionDisabled()) &&assignmentProblems && assignmentProblems.length > 0 ? (
-                 <div className = {styles.submit_container}>
-                <button className={styles.buttons} onClick={handleSubmit}
-                        >Submit</button>
-                </div>
-            ) : null}
-            </div>
-            </Grid>
+                <h1 style={{gridColumnStart:2}}>Submit Assignment</h1> 
+                <button style={{marginLeft:'auto'}} className='btnPrimary' onClick={() => {history.goBack()}}>Back to Course</button>
             </div>
 
-            <div className={styles.header}>
-                <h1>{`Submissions`}</h1>
-                <hr className = {styles.line}/>
+            <div className={styles.details}>
+                <div className={styles.assignmentDetails}>
+                    <h2>{course?.number} - {assignment?.name}</h2>
+                    <div>{assignment?.description}</div>
+                </div>
+                <div className={styles.submissionDetails}>
+                    <span className={styles.metaText}>
+                        <strong>Due Date:&nbsp;</strong>{assignment?.dueDate ? fullWordPrintDate(assignment?.dueDate) : "N/A"}
+                    </span>
+                    <span className={styles.metaText}>
+                        <strong>Available Until:&nbsp;</strong>{assignment?.endDate ? fullWordPrintDate(assignment?.dueDate) : "N/A"}
+                    </span>
+                    <span className={styles.metaText}>
+                        <strong>Submissions Made:&nbsp;</strong>{submissions.length +"/"+ assignment?.maxSubmissions}
+                    </span>
+                    <span>
+                        <a onClick={() => history.push(`/course/${courseId}/assignment/${assignmentId}/submissions`)}
+                        className={styles.handinHistory}>View Handin History</a>
+                    </span>
+                </div>
+            </div>
+            <div className={styles.details} style={{marginTop: '20px'}}>
+                <div className={styles.assignmentDetails}>
+                    <span className={styles.metaText}>
+                        <strong>Assignment Category:&nbsp;</strong>{assignment?.categoryName}
+                    </span>
+                    <span className={styles.metaText}>
+                        <strong>Attachments:&nbsp;</strong>{assignment?.attachmentsFilenames} {/*Need to add mapping behavior to this when I figure out file storage to add links - Diego */}
+                    </span>
+                </div>
+                {role.isInstructor() && <div className={styles.options_section}>
+                        <button className={`btnPrimary ${styles.parallel_button}`} onClick={() => {
+                            history.push(`/course/${courseId}/assignment/${assignmentId}/update`)
+                        }}>Edit Assignment</button>
+                        <button className={`btnPrimary ${styles.parallel_button}`}>Grade Submissions</button>
+                        <button className={`btnPrimary ${styles.parallel_button}`}>Scoreboard</button>
+                </div>}
+            </div>
+            
+            <div className={styles.problems_section}>
+                <div className={styles.problems_list}>
+                    <h2>Problems</h2>
+                    {assignmentProblems.length != 0 ? (assignmentProblems.map((problem) => (
+                        <>
+                            <AssignmentProblemListItem problem={problem} handleChange={handleChange}/>
+                            <hr/>
+                        </>
+                    ))) : <div style={{fontStyle:'italic', textAlign: 'center', marginTop: '10px'}}> No problems yet...</div>}
+                    {!(isSubmissionDisabled()) && assignmentProblems && assignmentProblems.length > 0 ? (
+                        <div className = {styles.submit_container}>
+                            <div className={styles.affirmation}>
+                                <input type='checkbox' onClick={handleCheckboxChange}/>
+                                <span className={styles.affirmText}>I affirm that I have complied with this course's academic integrity policy as defined in the syllabus.</span>
+                            </div>
+                            <button className='btnPrimary'
+                            style={{marginTop:'40px'}} 
+                            onClick={handleSubmit}
+                            disabled={notClickable}
+                                >Submit Assignment</button>
+                        </div>
+                        ) : null}
+                    </div>
             </div>
 
 

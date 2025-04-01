@@ -1,5 +1,6 @@
 @import 'variables';
 
+
 .wrap {
 	display:flex;
 	align-items: baseline;
@@ -8,12 +9,96 @@
 	justify-content:center;
 }
 
+.details{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
 
-.header {
+.assignmentDetails{
+    width: 100%;
+    text-align: left;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+    display: flex;
+    align-items: flex-start;
+}
+
+.submissionDetails{
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-	color: $text-color;
+    gap: 10px;
+    margin-left: auto;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: $list-item-background-hover;
+    border-radius: 20px
+}
+
+.metaText{
+    display: inline-block;
+    height: fit-content;
+    word-wrap: break-word;
+}
+
+.header {
+    color: $text-color;
+    display: grid;
+    grid-template-columns: 1fr 2.5fr 1fr;
+    justify-items: center;
+    align-items: center;
+}
+
+.problems_section{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.options_section{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.problems_list{
+    width: 50%;
+    gap: 10px;
+}
+
+.no_problems{
+    font-style: italic;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.submit_container{
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; 
+}
+.affirmation{
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    align-self: flex-start;
+    gap: 10px;
+}
+
+.affirmText{
+    color: $text-color;
+}
+
+.handinHistory{
+    text-decoration: underline;
+    cursor: pointer
 }
 
 
@@ -51,15 +136,6 @@
 	justify-content: center;
     gap: 10px; 
     
-}
-
-.submit_container{
-	display: flex;
-    justify-content: flex-end;
-    align-items: flex-end; 
-    width: 100%; 
-    margin-top: auto; 
- 
 }
 
 
@@ -140,7 +216,6 @@
 .submissionsContainer {
     display: flex;
     flex-direction: column;
-    padding: 30px;
     width: 100%; 
     margin-top: 20px;
 }
@@ -150,15 +225,16 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
-    background-color: $list-item-background;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease; 
+    background-color: $background;
+    border: 2px solid $primary;
+    transition: all 0.2s ease; 
     padding: 10px;
+    cursor: pointer;
 }
 
 .submissionCard:hover {
-    transform: scale(1.02); 
+    background-color: var(--purple-lightest);
 }
 
 .submissionHeading {
@@ -174,7 +250,7 @@
     padding: 10px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: $extreme) {
     .wrap {
         flex-direction: column;
         align-items: center;
@@ -208,6 +284,9 @@
         width: 200px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	    margin: 20px;
+    }
+    .problems_list{
+        width: 100%;
     }
 }
 

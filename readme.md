@@ -2,7 +2,7 @@
 
 Dev Deployment: https://devu.app
 
-Figma: https://www.figma.com/design/Ei3nuzCcGCtorXXYCZxiwS/DevU---Fall-2024?node-id=0-1&p=f&m=dev
+Figma: https://www.figma.com/design/I1p68BKK7w1E0JgfxWE2x0/devu-2.0?node-id=199-2&p=f&t=9Bq5OiHqK8mNlKHt-0
 
 DevU is an automated software-grading platform being developed at the University at Buffalo. DevU aims to be incredibly
 extensible, allowing professors to add any functionality they desire without reaching a dead end. It will eventually
@@ -146,12 +146,10 @@ query: CREATE TABLE "users" ("id" SERIAL NOT NULL, "createdAt" TIMESTAMP NOT NUL
 
 ## Deploy script
 
-To quickly setup a production version of devU you can call the [setup script](setup.sh)
+To quickly setup a semi-production version of devU you can call the [setup script](setup.sh)
 
 ```
  bash <(curl -sSL https://raw.githubusercontent.com/makeopensource/devU/refs/heads/develop/setup.sh) makeopensource develop
 ```
 
 This will download our [compose file](example-docker-compose.yml) with our pre-built images
-
-Currently, built only for develop, and setup the required config for tango

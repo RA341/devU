@@ -1,5 +1,7 @@
 @import 'variables';
 
+
+
 .title {
   display: flex;
   flex-direction: column;
@@ -47,14 +49,13 @@
   flex-direction: column;
 
 
-  border-radius: 0.6rem;
-  transition: background-color 0.2s linear;
+  transition: all 0.2s ease;
 
   // color: $primary;
 
   color: $text-color;
-  // &:hover,
-  // &:focus {
-  //   background: $list-simple-item-background-hover;
-  // }
+  &:hover,
+  &:focus {
+   background-color: $list-item-background-hover;
+  }
 }
