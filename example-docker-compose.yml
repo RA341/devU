@@ -22,8 +22,8 @@ services:
   client:
     image: ghcr.io/makeopensource/devu/client:develop
     environment:
-      - API_URL=https://devu.app # todo change this to prod api url
-      - ROOT_PATH=/
+      API_URL: https://devu.app # todo change this to prod api url
+      ROOT_PATH: /
     volumes:
       - ./dist:/out
 
@@ -44,6 +44,11 @@ services:
   leviathan:
     container_name: leviathan
     image: ghcr.io/makeopensource/leviathan:master
+    environment:
+      # change to debug to see all logs
+      LEVIATHAN_LOG_LEVEL: info
+      # change to true to show file paths of where the logs are generated
+      LEVIATHAN_LOG_SHOW_CALLER_FILE: false
     ports:
       - "9221:9221"
     volumes:
@@ -102,33 +107,3 @@ services:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_INCLUDE_STOPPED=true
     restart: unless-stopped
-
-    #  leviathan can run tango jobs, here in case we need it later
-    #  tango:
-    #    container_name: tango
-    #    ports:
-    #      - '127.0.0.1:3000:3000'
-    #    image: ghcr.io/makeopensource/devu/tango:develop
-    #    environment:
-    #      - DOCKER_REDIS_HOSTNAME=redis
-    #      - RESTFUL_KEY=devutangokey
-    #      # TODO remember to modify the below to be the path to the absolute path of tango_files` on your host machine
-    #      - DOCKER_TANGO_HOST_VOLUME_PATH=/absolute/path/to/tango_files
-    #    depends_on:
-    #      - redis
-    #    volumes:
-    #      - ./tango.config.py:/opt/TangoService/Tango/config.py
-    #      - /var/run/docker.sock:/var/run/docker.sock
-    #      - ./logs/tango/:/var/log/tango/
-    #      - ./logs/tangonginx:/var/log/nginx
-    #      - ./tango_files:/opt/TangoService/Tango/volumes
-    #    restart: unless-stopped
-    #
-    #  redis:
-    #    container_name: redis
-    #    image: redis:latest
-    #    ports:
-    #      - '127.0.0.1:6379:6379'
-    #    deploy:
-    #      replicas: 1
-    #    restart: unless-stopped
