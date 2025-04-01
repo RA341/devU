@@ -23,21 +23,19 @@ else
 fi
 
 # Prompt for URLs
-read -rp "Enter the frontend URL (e.g., https://devu.app): " client_url
-client_url=${client_url:-"https://client.devu.app"}  # Set default if empty
+read -p "Enter the frontend URL (e.g., https://devu.app): " client_url
 
-read -rp "Enter the API URL (e.g., https://api.devu.app): " api_url
-api_url=${api_url:-"https://api.devu.app"}  # Set default if empty
+read -p "Enter the API URL (e.g., https://api.devu.app): " api_url
 
 # Prompt for port configuration with defaults from the compose file
-read -rp "Enter the port to expose the API (default: 3001): " api_port
+read -p "Enter the port to expose the API (default: 3001): " api_port
 api_port=${api_port:-3001}
 
-read -rp "Enter the port to expose the client (default: 9000): " client_port
+read -p "Enter the port to expose the client (default: 9000): " client_port
 client_port=${client_port:-9000}
 
 # Prompt for watchtower configuration
-read -rp "Enable watchtower auto-update service? (y/N): " use_watchtower
+read -p "Enable watchtower auto-update service? (y/N): " use_watchtower
 use_watchtower=${use_watchtower:-"n"}  # Default to "n" if empty
 use_watchtower=${use_watchtower,,}     # Convert to lowercase
 
@@ -58,7 +56,7 @@ fi
 
 # Use sed to replace the placeholder URLs in the docker-compose file
 sed -i "s|CLIENT_URL: https://client.devu.app|CLIENT_URL: $client_url|g" "$compose_local_filename"
-sed -i "s|API_URL=https://devu.app|API_URL=$api_url|g" "$compose_local_filename"
+sed -i "s|API_URL: https://devu.app|API_URL: $api_url|g" "$compose_local_filename"
 
 # Update the port mappings
 sed -i "s|      - '3001:3001'|      - '$api_port:3001'|g" "$compose_local_filename"
