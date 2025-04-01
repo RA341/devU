@@ -1,63 +1,51 @@
-# example compose file
-
 name: devu
 services:
   api:
-    container_name: devu-api
-    image: ghcr.io/makeopensource/devu/api:develop
+    # Runs the API
+    container_name: api
+    build:
+      context: .
+      dockerfile: api.Dockerfile
     environment:
+      TANGO_KEY: devutangokey # TODO: load in from env file. for now this is defined in tango section below
       WAIT_HOSTS: db:5432
-      CLIENT_URL: https://devu.app # TODO change the client url here if needed
       LEVIATHAN_URL: http://leviathan:9221
-    depends_on:
-      db:
-        condition: service_started
     ports:
       - '3001:3001'
-    restart: unless-stopped
+    profiles:
+      - '' # so it starts with normal docker compose
+      - 'dev-client' # start when developing client
 
   client:
-    image: ghcr.io/makeopensource/devu/client:develop
-    environment:
-      - API_URL=https://api.devu.app # todo change this to prod api url
-      - ROOT_PATH=/
+    # Builds the front end and exports static files to ./dist
+    build:
+      context: .
+      dockerfile: client.Dockerfile
     volumes:
       - ./dist:/out
+    profiles:
+      - '' # so it starts with normal docker compose
+      - 'dev-api' # start when developing api
 
-  # Hosts the front end static files from ./dist/local thorough a web server
   nginx:
-    container_name: devu-client-nginx
-    image: ghcr.io/makeopensource/devu/nginx:develop
+    # Hosts the front end static files from ./dist/local thorough a web server
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
     volumes:
       - ./dist/local:/usr/share/nginx/html
+    command: >
+      /bin/sh -c "echo 'Frontend is now accessible at http://localhost:9000' && nginx -g 'daemon off;'"
     depends_on:
       client:
         condition: service_completed_successfully
     ports:
       - '9000:80'
-    restart: unless-stopped
+    profiles:
+      - '' # so it starts with normal docker compose
+      - 'dev-api' # start when developing api
 
-  # leviathan stuff
-  leviathan:
-    container_name: leviathan
-    image: ghcr.io/makeopensource/leviathan:master
-    ports:
-      - "9221:9221"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./levi/:/app/appdata
-    restart: unless-stopped
-
-  # testing frontend for leviathan
-  kraken:
-    container_name: kraken
-    image: ghcr.io/makeopensource/leviathan/kraken:master
-    ports:
-      - "3022:3000"
-    environment:
-      - LEVIATHAN_URL=http://levi:9221
-    restart: unless-stopped
-
+  # Database stuff
   db:
     # Runs the PostgreSQL database
     image: postgres
@@ -65,8 +53,6 @@ services:
       POSTGRES_DB: typescript_api
       POSTGRES_USER: typescript_user
       POSTGRES_PASSWORD: password
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     expose:
@@ -80,52 +66,31 @@ services:
       - '9001:9001'
     expose:
       - '9000'
-    volumes:
-      - ./minio:/data
+    #    volumes:
+    #      - /tmp/data:/data
     environment:
       MINIO_ROOT_USER: typescript_user
       MINIO_ROOT_PASSWORD: changeMe
     command: server /data --console-address ":9001"
-    restart: unless-stopped
 
-  # auto update containers
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower
+  leviathan:
+    container_name: leviathan
+    image: ghcr.io/makeopensource/leviathan:master
+    environment:
+      LEVIATHAN_LOG_LEVEL: debug # verbose logs for dev
+    ports:
+      - "9221:9221"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - WATCHTOWER_POLL_INTERVAL=900 # check for new image every 15 min
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_INCLUDE_STOPPED=true
+      - ./levi/:/app/appdata
     restart: unless-stopped
 
-    #  leviathan can run tango jobs, here in case we need it later
-    #  tango:
-    #    container_name: tango
-    #    ports:
-    #      - '127.0.0.1:3000:3000'
-    #    image: ghcr.io/makeopensource/devu/tango:develop
-    #    environment:
-    #      - DOCKER_REDIS_HOSTNAME=redis
-    #      - RESTFUL_KEY=devutangokey
-    #      # TODO remember to modify the below to be the path to the absolute path of tango_files` on your host machine
-    #      - DOCKER_TANGO_HOST_VOLUME_PATH=/absolute/path/to/tango_files
-    #    depends_on:
-    #      - redis
-    #    volumes:
-    #      - ./tango.config.py:/opt/TangoService/Tango/config.py
-    #      - /var/run/docker.sock:/var/run/docker.sock
-    #      - ./logs/tango/:/var/log/tango/
-    #      - ./logs/tangonginx:/var/log/nginx
-    #      - ./tango_files:/opt/TangoService/Tango/volumes
-    #    restart: unless-stopped
-    #
-    #  redis:
-    #    container_name: redis
-    #    image: redis:latest
-    #    ports:
-    #      - '127.0.0.1:6379:6379'
-    #    deploy:
-    #      replicas: 1
-    #    restart: unless-stopped
+  # optional frontend service for leviathan to interact directly with it
+  #  kraken:
+  #    container_name: kraken
+  #    image: ghcr.io/makeopensource/leviathan/kraken:master
+  #    ports:
+  #      - "3022:3000"
+  #    environment:
+  #      - LEVIATHAN_URL=http://levi:9221
+  #    restart: unless-stopped
