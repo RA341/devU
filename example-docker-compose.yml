@@ -5,10 +5,9 @@
 name: devu
 services:
   api:
-    container_name: api
-    image: ghcr.io/ra341/devu/api:develop
+    container_name: devu-api
+    image: ghcr.io/makeopensource/devu/api:develop
     environment:
-      TANGO_KEY: devutangokey # TODO: load in from env file. for now this is defined in tango section below
       WAIT_HOSTS: db:5432
       CLIENT_URL: https://client.devu.app # TODO change the client url here if needed
       LEVIATHAN_URL: http://leviathan:9221
@@ -20,7 +19,7 @@ services:
     restart: unless-stopped
 
   client:
-    image: ghcr.io/ra341/devu/client:develop
+    image: ghcr.io/makeopensource/devu/client:develop
     environment:
       API_URL: https://devu.app # todo change this to prod api url
       ROOT_PATH: /
@@ -30,7 +29,7 @@ services:
   # Hosts the front end static files from ./dist/local thorough a web server
   nginx:
     container_name: devu-client-nginx
-    image: ghcr.io/ra341/devu/nginx:develop
+    image: ghcr.io/makeopensource/devu/nginx:develop
     volumes:
       - ./dist/local:/usr/share/nginx/html
     depends_on:
@@ -44,11 +43,6 @@ services:
   leviathan:
     container_name: leviathan
     image: ghcr.io/makeopensource/leviathan:master
-    environment:
-      # change to debug to see all logs
-      LEVIATHAN_LOG_LEVEL: info
-      # change to true to show file paths of where the logs are generated
-      LEVIATHAN_LOG_SHOW_CALLER_FILE: false
     ports:
       - "9221:9221"
     volumes:
